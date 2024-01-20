@@ -1,5 +1,7 @@
 import { $, component$, useSignal } from "@builder.io/qwik";
-import { Form, routeAction$, zod$ } from "@builder.io/qwik-city";
+import { Form, routeAction$, useNavigate, zod$ } from "@builder.io/qwik-city";
+import { Button } from "~/components/button";
+import { Input } from "~/components/input";
 import { prisma } from "~/prisma";
 
 export const useCreateEvent = routeAction$(
@@ -47,37 +49,38 @@ export default component$(() => {
   const createEventAction = useCreateEvent();
   const changes = useSignal(1);
   const addChange = $(() => (changes.value += 1));
+  const nav = useNavigate();
 
   return (
     <>
-      <Form action={createEventAction} class="flex flex-col">
+      <Form
+        action={createEventAction}
+        onSubmitCompleted$={() => nav("/")}
+        class="flex flex-col gap-y-2"
+      >
         {[...Array(changes.value).keys()].map((index) => {
           const productNameKey = `changes.${index}.productName`;
-          const qualityKey = `changes.${index}.quantity`;
+          const quantityKey = `changes.${index}.quantity`;
           return (
             <div key={index}>
-              <label>
-                Product name
-                <input
-                  name={productNameKey}
-                  value={createEventAction.formData?.get(productNameKey)}
-                />
-              </label>
-              <label>
-                Quantity
-                <input
-                  name={qualityKey}
-                  type="number"
-                  value={createEventAction.formData?.get(qualityKey)}
-                />
-              </label>
+              <Input
+                label="Product name"
+                value={createEventAction.formData?.get(productNameKey)}
+                name={productNameKey}
+              />
+              <Input
+                label="Quantity"
+                value={createEventAction.formData?.get(quantityKey)}
+                name={quantityKey}
+                type="number"
+              />
             </div>
           );
         })}
-        <button type="button" onClick$={addChange}>
+        <Button type="button" onClick$={addChange}>
           +
-        </button>
-        <button type="submit">Create</button>
+        </Button>
+        <Button type="submit">Create</Button>
       </Form>
       {createEventAction.value && !createEventAction.value.failed && (
         <div>
