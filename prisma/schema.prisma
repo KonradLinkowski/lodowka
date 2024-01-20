@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Event {
+  id      Int      @id @default(autoincrement())
+  changes Change[]
+}
+
+model Change {
+  id        Int     @id @default(autoincrement())
+  quantity  Float
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  Event     Event?  @relation(fields: [eventId], references: [id])
+  eventId   Int
+}
+
+model Product {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  change Change[]
+}
